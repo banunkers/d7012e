@@ -34,11 +34,9 @@ sortSubsets (x : xs) = ins x (sortSubsets xs)
  where
   ins x [] = [x]
   ins x (h : t)
-    | fst' x < fst' h  = x : h : t
-    | fst' x == fst' h = if length' x <= length' h then x : h : t else h : x : t
+    | fst' x <= fst' h  = x : h : t
     | otherwise        = h : ins x t
   fst' (x, _, _, _) = x
-  length' (_, x, _, _) = length x
 
 -- Returns a list of all the subsets containing (size, list, start-, end index)
 getSubsets :: [Int] -> [(Int, [Int], Int, Int)]
@@ -59,3 +57,11 @@ printSubsets s = header ++ formatSubsets s
 smallestKset :: [Int] -> Int -> IO ()
 smallestKset [] _ = error "List is empty, cannot compute smallest k sets"
 smallestKset xs k = putStr (printSubsets (take k (getSubsets xs)))
+
+-- Test cases
+testCase1 :: IO ()
+testCase1 = smallestKset [ x * (-1) ^ x | x <- [1 .. 100] ] 15
+testCase2 :: IO ()
+testCase2 = smallestKset [24, -11, -34, 42, -24, 7, -19, 21] 6
+testCase3 :: IO ()
+testCase3 = smallestKset [3,2,-4,3,2,-5,-2,2,3,-3,2,-5,6,-2,2,3] 8
