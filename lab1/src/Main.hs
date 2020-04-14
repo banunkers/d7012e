@@ -1,7 +1,8 @@
+-- Hugo Wangler - hugwan-6
 module Main where
 
 main :: IO ()
-main = testCase1
+main = smallestKset [-1, 2, -3, 4, -5] 3
 
 -- Returns all consecutive subsets containing the first int in the list
 -- the subsets are returned as a triple with (subset, start-, end index)
