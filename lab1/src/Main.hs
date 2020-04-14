@@ -4,14 +4,13 @@ main :: IO ()
 main = testCase1
 
 -- Returns all consecutive subsets containing the first int in the list
--- the subsets are returned as a triple with start-, end index and the subset
+-- the subsets are returned as a triple with (subset, start-, end index)
 subsets :: [Int] -> [([Int], Int, Int)]
 subsets [x] = [([x], 1, 1)]
 subsets (x : xs) =
   ([x], 1, 1) : map (\(tail, i, j) -> (x : tail, i, j + 1)) (subsets xs)
 
 -- Returns a list of all consecutive subsets of a list
--- the subsets are returned as a triple with start-, end index and the subset
 allSubsets :: [Int] -> [([Int], Int, Int)]
 allSubsets [x] = [([x], 1, 1)]
 allSubsets (x : xs) =
@@ -26,7 +25,7 @@ sizeSubsets (x : xs   ) = sizeSubsets [x] ++ sizeSubsets xs
   sum = foldr (+) 0
 
 -- Sorts the subsets with regard to their sizes from smallest to largest
--- using insertion sort with subset length as decider
+-- using insertion sort
 sortSubsets :: [(Int, [Int], Int, Int)] -> [(Int, [Int], Int, Int)]
 sortSubsets [x     ] = [x]
 sortSubsets (x : xs) = ins x (sortSubsets xs)
@@ -36,7 +35,7 @@ sortSubsets (x : xs) = ins x (sortSubsets xs)
                 | otherwise        = h : ins x t
   fst' (x, _, _, _) = x
 
--- Returns a list of all the subsets containing (size, list, start-, end index)
+-- Returns a sorted list of all the subsets 
 getSubsets :: [Int] -> [(Int, [Int], Int, Int)]
 getSubsets = sortSubsets . sizeSubsets . allSubsets
 
