@@ -7,14 +7,14 @@ main = putStr
 -- Returns all consecutive subsets containing the first int in the list
 -- the subsets are returned as a triple with start-, end index and the subset
 subsets :: [Int] -> [([Int], Int, Int)]
-subsets [x] = [([x], 0, 0)]
+subsets [x] = [([x], 1, 1)]
 subsets (x : xs) =
-  ([x], 0, 0) : map (\(tail, i, j) -> (x : tail, i, j + 1)) (subsets xs)
+  ([x], 1, 1) : map (\(tail, i, j) -> (x : tail, i, j + 1)) (subsets xs)
 
 -- Returns a list of all consecutive subsets of a list
 -- the subsets are returned as a triple with start-, end index and the subset
 allSubsets :: [Int] -> [([Int], Int, Int)]
-allSubsets [x] = [([x], 0, 0)]
+allSubsets [x] = [([x], 1, 1)]
 allSubsets (x : xs) =
   subsets (x : xs) ++ map (\(s, i, j) -> (s, i + 1, j + 1)) (allSubsets xs)
 
