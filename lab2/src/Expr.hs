@@ -115,8 +115,10 @@ simplify (Op oper left right) =
         (op , le     , re     ) -> Op op le re
 simplify (App func arg) = App func (simplify arg)
 
+-- Returnes a partially applied function if called with no arg
+-- which works as a function when binded and called with arg
 mkfun :: (EXPR, EXPR) -> (Float -> Float)
-mkfun (body, var) = undefined
+mkfun (body, var) arg = eval body [(unparse var, arg)]
 
 -- Tests
 testSin =
@@ -124,3 +126,4 @@ testSin =
 testCos =
   putStrLn (unparse (simplify (diff (Var "x") (parse "exp(cos(2*x))"))))
 testLog = putStrLn (unparse (simplify (diff (Var "x") (parse "log(x*x)"))))
+testMkfun = mkfun (parse "x*x+2", Var "x") 3.0
