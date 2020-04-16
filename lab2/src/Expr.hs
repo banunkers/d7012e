@@ -92,7 +92,7 @@ diff v (Op "/" e1 e2) = Op
   (Op "-" (Op "*" (diff v e1) e1) (Op "*" e1 (diff v e2)))
   (Op "*" e2 e2)
 diff v (App "sin" arg) = Op "*" (diff v arg) (App "cos" arg)
-diff v (App "cos" arg) = Op "-" (Const 0) (Op "*" (diff v arg) (App "sin" arg))
+diff v (App "cos" arg) = Op "*" (Const (-1)) (Op "*" (diff v arg) (App "sin" arg))
 diff v (App "log" arg) = Op "/" (diff v arg) arg
 diff v (App "exp" arg) = Op "*" (diff v arg) (App "exp" arg)
 diff _ _               = error "can not compute the derivative"
@@ -114,6 +114,9 @@ simplify (Op oper left right) =
         ("-", le, re) -> if left == right then Const 0 else Op "-" le re
         (op , le     , re     ) -> Op op le re
 simplify (App func arg) = App func (simplify arg)
+
+mkfun :: (EXPR, EXPR) -> (Float -> Float)
+mkfun (body, var) = undefined
 
 -- Tests
 testSin =
