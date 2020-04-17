@@ -92,7 +92,8 @@ diff v (Op "/" e1 e2) = Op
   (Op "-" (Op "*" (diff v e1) e1) (Op "*" e1 (diff v e2)))
   (Op "*" e2 e2)
 diff v (App "sin" arg) = Op "*" (diff v arg) (App "cos" arg)
-diff v (App "cos" arg) = Op "*" (Const (-1)) (Op "*" (diff v arg) (App "sin" arg))
+diff v (App "cos" arg) =
+  Op "*" (Const (-1)) (Op "*" (diff v arg) (App "sin" arg))
 diff v (App "log" arg) = Op "/" (diff v arg) arg
 diff v (App "exp" arg) = Op "*" (diff v arg) (App "exp" arg)
 diff _ _               = error "can not compute the derivative"
@@ -115,10 +116,19 @@ simplify (Op oper left right) =
         (op , le     , re     ) -> Op op le re
 simplify (App func arg) = App func (simplify arg)
 
--- Returnes a partially applied function if called with no arg
+-- Returns a partially applied function if called with no arg
 -- which works as a function when binded and called with arg
 mkfun :: (EXPR, EXPR) -> (Float -> Float)
 mkfun (body, var) arg = eval body [(unparse var, arg)]
+
+findzero :: String -> String -> Float -> Float
+findzero v body v0 =
+  let fn  = mkfun (parse body, parse v)
+      fn' = mkfun (diff (parse v) (parse body), parse v)
+  in  go fn fn' v0
+ where
+  go fn fn' v0 = if abs (fn v0) <= 0.00001 then v0 else go fn fn' v1
+    where v1 = v0 - (fn v0 / fn' v0)
 
 -- Tests
 testSin =
@@ -126,4 +136,4 @@ testSin =
 testCos =
   putStrLn (unparse (simplify (diff (Var "x") (parse "exp(cos(2*x))"))))
 testLog = putStrLn (unparse (simplify (diff (Var "x") (parse "log(x*x)"))))
-testMkfun = mkfun (parse "x*x+2", Var "x") 3.0
+testMkfun = mkfun (parse "x*x+2", Var "x")
