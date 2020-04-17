@@ -127,7 +127,7 @@ findzero v body v0 =
       fn' = mkfun (diff (parse v) (parse body), parse v)
   in  go fn fn' v0
  where
-  go fn fn' v0 = if abs (fn v0) <= 0.00001 then v0 else go fn fn' v1
+  go fn fn' v0 = if abs (v1 - v0) <= 0.0001 then v1 else go fn fn' v1
     where v1 = v0 - (fn v0 / fn' v0)
 
 -- Tests
