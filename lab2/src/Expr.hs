@@ -133,7 +133,15 @@ findzero v body v0 =
 -- Tests
 testSin =
   putStrLn (unparse (simplify (diff (Var "x") (parse "exp(sin(2*x))"))))
+
 testCos =
   putStrLn (unparse (simplify (diff (Var "x") (parse "exp(cos(2*x))"))))
+
 testLog = putStrLn (unparse (simplify (diff (Var "x") (parse "log(x*x)"))))
+
 testMkfun = mkfun (parse "x*x+2", Var "x")
+
+testFZ1 =
+  putStrLn ("0 = x*x*x+x-1 => x = " ++ show (findzero "x" "x*x*x+x-1" 1.0))
+testFZ2 = putStrLn
+  ("0 = cos(y)*sin(y) => y = " ++ show (findzero "y" "cos(y)*sin(y)" 2.0))
