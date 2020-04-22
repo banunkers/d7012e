@@ -1,4 +1,13 @@
-module Expr(Expr, T, parse, fromString, value, toString) where
+-- Hugo Wangler - hugwan-6
+module Expr
+  ( Expr
+  , T
+  , parse
+  , fromString
+  , value
+  , toString
+  )
+where
 
 {-
    An expression of type Expr is a representation of an arithmetic expression 
@@ -23,11 +32,13 @@ module Expr(Expr, T, parse, fromString, value, toString) where
    value e env evaluates e in an environment env that is represented by a
    Dictionary.T Int.  
 -}
-import Prelude hiding (return, fail)
-import Parser hiding (T)
+import           Prelude                 hiding ( return
+                                                , fail
+                                                )
+import           Parser                  hiding ( T )
 import qualified Dictionary
 
-data Expr = Num Integer | Var String | Add Expr Expr 
+data Expr = Num Integer | Var String | Add Expr Expr
        | Sub Expr Expr | Mul Expr Expr | Div Expr Expr
          deriving Show
 
@@ -41,38 +52,45 @@ var = word >-> Var
 
 num = number >-> Num
 
-mulOp = lit '*' >-> (\ _ -> Mul) !
-        lit '/' >-> (\ _ -> Div)
+mulOp = lit '*' >-> (\_ -> Mul) ! lit '/' >-> (\_ -> Div)
 
-addOp = lit '+' >-> (\ _ -> Add) !
-        lit '-' >-> (\ _ -> Sub)
+addOp = lit '+' >-> (\_ -> Add) ! lit '-' >-> (\_ -> Sub)
 
-bldOp e (oper,e') = oper e e'
+bldOp e (oper, e') = oper e e'
 
-factor = num !
-         var !
-         lit '(' -# expr #- lit ')' !
-         err "illegal factor"
-             
+factor = num ! var ! lit '(' -# expr #- lit ')' ! err "illegal factor"
+
 term' e = mulOp # factor >-> bldOp e #> term' ! return e
 term = factor #> term'
-       
+
 expr' e = addOp # term >-> bldOp e #> expr' ! return e
 expr = term #> expr'
 
 parens cond str = if cond then "(" ++ str ++ ")" else str
 
 shw :: Int -> Expr -> String
-shw prec (Num n) = show n
-shw prec (Var v) = v
-shw prec (Add t u) = parens (prec>5) (shw 5 t ++ "+" ++ shw 5 u)
-shw prec (Sub t u) = parens (prec>5) (shw 5 t ++ "-" ++ shw 6 u)
-shw prec (Mul t u) = parens (prec>6) (shw 6 t ++ "*" ++ shw 6 u)
-shw prec (Div t u) = parens (prec>6) (shw 6 t ++ "/" ++ shw 7 u)
+shw prec (Num n  ) = show n
+shw prec (Var v  ) = v
+shw prec (Add t u) = parens (prec > 5) (shw 5 t ++ "+" ++ shw 5 u)
+shw prec (Sub t u) = parens (prec > 5) (shw 5 t ++ "-" ++ shw 6 u)
+shw prec (Mul t u) = parens (prec > 6) (shw 6 t ++ "*" ++ shw 6 u)
+shw prec (Div t u) = parens (prec > 6) (shw 6 t ++ "/" ++ shw 7 u)
 
 value :: Expr -> Dictionary.T String Integer -> Integer
-value (Num n) _ = error "value not implemented"
+value (Num n) _   = n
+value (Var v) env = case Dictionary.lookup v env of
+  Just val -> val
+  Nothing  -> error ("Undefined variable " ++ v)
+value (Add t u) env = value t env + value u env
+value (Sub t u) env = value t env - value u env
+value (Mul t u) env = value t env * value u env
+value (Div t u) env =
+  value t env
+    `div` (case value u env of
+            0 -> error "Division by 0"
+            n -> n
+          )
 
 instance Parse Expr where
-    parse = expr
-    toString = shw 0
+  parse    = expr
+  toString = shw 0
