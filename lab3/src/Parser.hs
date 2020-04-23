@@ -55,10 +55,8 @@ word :: Parser String
 word = token (letter # iter letter >-> cons)
 
 chars :: Int -> Parser String
-chars = iterate char
- where
-  iterate m 0 = return []
-  iterate m i = m # iterate m (i - 1) >-> cons
+chars 0 = return []
+chars n = char # chars (n - 1) >-> cons
 
 accept :: String -> Parser String
 accept w = token (chars (length w)) ? (== w)
