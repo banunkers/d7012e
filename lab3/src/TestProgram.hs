@@ -1,9 +1,11 @@
+-- Hugo Wangler - huwan-6
 {- Test for Program -}
 module TestProgram where
 
-import Program
+import           Program
 p, p1 :: Program.T
-p = fromString  ("\
+p = fromString
+  ("\
 \read k;\
 \read n;\
 \m := 1;\
@@ -14,9 +16,11 @@ p = fromString  ("\
 \    else\
 \      write m;\
 \    m := m + 1;\
-\  end")
+\  end"
+  )
 
-p1 = fromString  ("\
+p1 = fromString
+  ("\
 \read n;\
 \read b;\
 \m := 1;\
@@ -31,10 +35,11 @@ p1 = fromString  ("\
 \    p := p*10;\
 \    n :=q;\
 \  end\
-\write s;")
+\write s;"
+  )
 
 sp = putStr (toString p)
 
-rp = Program.exec p [3,16]
+rp = Program.exec p [3, 16]
 
 rp1 = Program.exec p1 [1024, 2]

@@ -68,25 +68,46 @@ exec (Assignment ident e : stmts) dict input =
 exec (Read ident : stmts) dict input =
   exec stmts (Dictionary.insert (ident, head input) dict) (tail input)
 exec (Write e : stmts) dict input = Expr.value e dict : exec stmts dict input
-exec [] _ _ = []
+exec []                _    _     = []
+
+-- helper fucntion for toString which appends correct number of tabs
+formatToString :: T -> Int -> String
+formatToString (If cond thenStmts elseStmts) tabs =
+  formatTabs tabs
+    ++ "if "
+    ++ Expr.toString cond
+    ++ " then\n"
+    ++ formatToString thenStmts (tabs + 1)
+    ++ "\n"
+    ++ formatTabs tabs
+    ++ "else\n"
+    ++ formatToString elseStmts (tabs + 1)
+formatToString (While cond doStmts) tabs =
+  "while " ++ Expr.toString cond ++ " do\n" ++ formatTabs tabs ++ formatToString
+    doStmts
+    (tabs + 1)
+formatToString Skip tabs = formatTabs tabs ++ "skip;"
+formatToString (Assignment ident e) tabs =
+  formatTabs tabs ++ ident ++ " := " ++ Expr.toString e ++ ";"
+formatToString (Begin beginStmts) tabs =
+  formatTabs tabs
+    ++ "begin\n"
+    ++ toStringStmts beginStmts (tabs + 1)
+    ++ "\n"
+    ++ formatTabs tabs
+    ++ "end"
+ where
+  toStringStmts :: [T] -> Int -> String
+  toStringStmts [stmt] tabs = formatToString stmt tabs
+  toStringStmts (stmt : stmts) tabs =
+    formatToString stmt tabs ++ "\n" ++ toStringStmts stmts tabs
+formatToString (Write ident) tabs = formatTabs tabs ++ "write " ++ Expr.toString ident ++ ";"
+formatToString (Read  ident) tabs = formatTabs tabs ++ "read " ++ ident ++ ";"
+
+formatTabs :: Int -> String
+formatTabs 0 = ""
+formatTabs n = "    " ++ formatTabs (n - 1)
 
 instance Parse Statement where
   parse = read ! write ! skip ! assignment ! if' ! while ! begin
-  toString (If cond thenStmts elseStmts) =
-    "if "
-      ++ Expr.toString cond
-      ++ " then\n\t"
-      ++ toString thenStmts
-      ++ "\nelse\n\t"
-      ++ toString elseStmts
-  toString (While cond doStmts) =
-    "while " ++ Expr.toString cond ++ " do\n\t" ++ toString doStmts
-  toString Skip                 = "skip;"
-  toString (Assignment ident e) = ident ++ " := " ++ Expr.toString e
-  toString (Begin beginStmts) =
-    "begin\n\t" ++ toStringStmts beginStmts ++ "end"
-   where
-    toStringStmts [stmt        ] = toString stmt
-    toStringStmts (stmt : stmts) = toString stmt ++ "\n" ++ toStringStmts stmts
-  toString (Write ident) = "write " ++ Expr.toString ident
-  toString (Read  ident) = "read " ++ ident
+  toString stmts = formatToString stmts 0
