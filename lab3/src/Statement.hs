@@ -10,6 +10,7 @@ where
 import           Prelude                 hiding ( return
                                                 , fail
                                                 , read
+                                                , repeat
                                                 )
 import           Parser                  hiding ( T )
 import qualified Dictionary
@@ -25,6 +26,7 @@ data Statement =
   | If Expr.T Statement Statement
   | While Expr.T Statement
   | Begin [Statement]
+  | Repeat Statement Expr.T
   deriving Show
 
 assignment = word #- accept ":=" # Expr.parse #- require ";" >-> buildAss
@@ -52,6 +54,12 @@ buildWhile (cond, doStmt) = While cond doStmt
 begin = accept "begin" -# iter parse #- require "end" >-> buildBegin
 buildBegin = Begin
 
+repeat =
+  (accept "repeat" -# parse #- require "until")
+    #   (Expr.parse #- require ";")
+    >-> buildRepeat
+buildRepeat (stmt, untilExpr) = Repeat stmt untilExpr
+
 exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
 exec (If cond thenStmts elseStmts : stmts) dict input =
   if Expr.value cond dict > 0
@@ -68,7 +76,11 @@ exec (Assignment ident e : stmts) dict input =
 exec (Read ident : stmts) dict input =
   exec stmts (Dictionary.insert (ident, head input) dict) (tail input)
 exec (Write e : stmts) dict input = Expr.value e dict : exec stmts dict input
-exec []                _    _     = []
+exec (Repeat doStmt untilExpr : stmts) dict input =
+  if Expr.value untilExpr dict > 0
+    then exec stmts dict input
+    else exec (doStmt : Repeat doStmt untilExpr : stmts) dict input
+exec [] _ _ = []
 
 -- helper fucntion for toString which appends correct number of tabs
 formatToString :: T -> Int -> String
@@ -97,17 +109,24 @@ formatToString (Begin beginStmts) tabs =
     ++ formatTabs tabs
     ++ "end"
  where
-  toStringStmts :: [T] -> Int -> String
   toStringStmts [stmt] tabs = formatToString stmt tabs
   toStringStmts (stmt : stmts) tabs =
     formatToString stmt tabs ++ "\n" ++ toStringStmts stmts tabs
-formatToString (Write ident) tabs = formatTabs tabs ++ "write " ++ Expr.toString ident ++ ";"
-formatToString (Read  ident) tabs = formatTabs tabs ++ "read " ++ ident ++ ";"
+formatToString (Write ident) tabs =
+  formatTabs tabs ++ "write " ++ Expr.toString ident ++ ";"
+formatToString (Read ident) tabs = formatTabs tabs ++ "read " ++ ident ++ ";"
+formatToString (Repeat doStmt untilExpr) tabs =
+  formatTabs tabs
+    ++ "repeat\n"
+    ++ formatToString doStmt (tabs + 1)
+    ++ "\nuntil "
+    ++ Expr.toString untilExpr
+    ++ ";"
 
 formatTabs :: Int -> String
 formatTabs 0 = ""
 formatTabs n = "    " ++ formatTabs (n - 1)
 
 instance Parse Statement where
-  parse = read ! write ! skip ! assignment ! if' ! while ! begin
+  parse = read ! write ! skip ! assignment ! if' ! while ! begin ! repeat
   toString stmts = formatToString stmts 0
