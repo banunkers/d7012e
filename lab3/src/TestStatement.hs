@@ -16,6 +16,6 @@ s9 = "while n do begin fac:=fac*n; n:=n-1; end"
 p9 = fromString s9
 p10 = fromString "begin read x ; x := x + 1 ; write x; end"
 p11 = fromString ("begin read n; fac:=1; " ++ s9 ++ " write fac; end")
-p12 = fromString "repeat begin s := s + n; n := n - 1; end until (0-n)+1"
+p12 = fromString "repeat begin s := s + n; n := n - 1; end until (0-n)+1;"
 
 
