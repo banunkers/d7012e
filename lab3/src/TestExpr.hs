@@ -1,12 +1,12 @@
+-- Hugo Wangler - hugwan-6
 {- Test for Expr-}
 module TestExpr where
 
 import qualified Dictionary
-import Expr
+import           Expr
 
-dict = Dictionary.insert ("x", 1) $
-       Dictionary.insert ("y", 2) $
-       Dictionary.empty 
+dict =
+  Dictionary.insert ("x", 1) $ Dictionary.insert ("y", 2) $ Dictionary.empty
 
 testValue string = value (fromString string) dict
 

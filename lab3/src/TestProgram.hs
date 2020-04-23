@@ -61,7 +61,8 @@ repeatPrint = putStr (toString repeatProgram)
 repeatExec = Program.exec repeatProgram [100] -- sum 1 to 100
 
 pr :: Program.T
-pr = fromString ("\
+pr = fromString
+  ("\
 \read k;\
 \write k;\
 \repeat\
@@ -69,7 +70,8 @@ pr = fromString ("\
 \ k := k + 1;\
 \ write k;\
 \ end\
-\until k;")
+\until k;"
+  )
 
 spr = putStr (toString pr)
 rpr k = Program.exec pr [k]

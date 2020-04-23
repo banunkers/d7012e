@@ -102,13 +102,17 @@ formatToString (If cond thenStmts elseStmts) tabs =
     ++ formatTabs tabs
     ++ "else\n"
     ++ formatToString elseStmts (tabs + 1)
+
 formatToString (While cond doStmts) tabs =
   "while " ++ Expr.toString cond ++ " do\n" ++ formatTabs tabs ++ formatToString
     doStmts
     (tabs + 1)
+
 formatToString Skip tabs = formatTabs tabs ++ "skip;"
+
 formatToString (Assignment ident e) tabs =
   formatTabs tabs ++ ident ++ " := " ++ Expr.toString e ++ ";"
+
 formatToString (Begin beginStmts) tabs =
   formatTabs tabs
     ++ "begin\n"
@@ -120,9 +124,12 @@ formatToString (Begin beginStmts) tabs =
   toStringStmts [stmt] tabs = formatToString stmt tabs
   toStringStmts (stmt : stmts) tabs =
     formatToString stmt tabs ++ "\n" ++ toStringStmts stmts tabs
+
 formatToString (Write ident) tabs =
   formatTabs tabs ++ "write " ++ Expr.toString ident ++ ";"
+
 formatToString (Read ident) tabs = formatTabs tabs ++ "read " ++ ident ++ ";"
+
 formatToString (Repeat doStmt untilExpr) tabs =
   formatTabs tabs
     ++ "repeat\n"

@@ -37,10 +37,10 @@ iter m = m # iter m >-> cons ! return []
 cons (a, b) = a : b
 
 (-#) :: Parser a -> Parser b -> Parser b
-m -# n = (m # n) >-> snd 
+m -# n = (m # n) >-> snd
 
 (#-) :: Parser a -> Parser b -> Parser a
-m #- n = (m # n) >-> fst 
+m #- n = (m # n) >-> fst
 
 spaces :: Parser String
 spaces = iter (char ? isSpace)
@@ -77,4 +77,3 @@ number' :: Integer -> Parser Integer
 number' n = digitVal #> (\d -> number' (10 * n + d)) ! return n
 number :: Parser Integer
 number = token (digitVal #> number')
-

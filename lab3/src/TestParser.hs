@@ -1,8 +1,11 @@
+-- Hugo Wangler -- hugwan-6
 {- Test for Parser.hs -}
 module TestParser where
 
-import Prelude hiding (return, fail)
-import Parser
+import           Prelude                 hiding ( return
+                                                , fail
+                                                )
+import           Parser
 
 l1 = letter "abc"   {- Just('a',"bc") -}
 l2 = letter "123"   {- Nothing -}

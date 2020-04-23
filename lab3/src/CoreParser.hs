@@ -1,3 +1,4 @@
+-- Hugo Wangler - hugwan-6
 module CoreParser(Parser, char, return, fail, (#), (!), (?), (#>), (>->),
                   Parse, parse, toString, fromString) where
 import Prelude hiding (return, fail)
