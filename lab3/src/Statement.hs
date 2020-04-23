@@ -65,21 +65,29 @@ exec (If cond thenStmts elseStmts : stmts) dict input =
   if Expr.value cond dict > 0
     then exec (thenStmts : stmts) dict input
     else exec (elseStmts : stmts) dict input
+
 exec (While cond doStmt : stmts) dict input = if Expr.value cond dict > 0
   then exec (doStmt : While cond doStmt : stmts) dict input
   else exec stmts dict input
+
 exec (Begin beginStmts : stmts) dict input =
   exec (beginStmts ++ stmts) dict input
+
 exec (Skip : stmts) dict input = exec stmts dict input
+
 exec (Assignment ident e : stmts) dict input =
   exec stmts (Dictionary.insert (ident, Expr.value e dict) dict) input
+
 exec (Read ident : stmts) dict input =
   exec stmts (Dictionary.insert (ident, head input) dict) (tail input)
+
 exec (Write e : stmts) dict input = Expr.value e dict : exec stmts dict input
+
+-- Always executes the repeat once, then creates a new If node that executes if
+-- the until condition is false, otherwise skip 
 exec (Repeat doStmt untilExpr : stmts) dict input =
-  if Expr.value untilExpr dict > 0
-    then exec stmts dict input
-    else exec (doStmt : Repeat doStmt untilExpr : stmts) dict input
+  exec (doStmt : If untilExpr Skip (Repeat doStmt untilExpr) : stmts) dict input
+
 exec [] _ _ = []
 
 -- helper fucntion for toString which appends correct number of tabs
