@@ -76,8 +76,9 @@ solveR(state(robot(r2, Items), _, _, _), _, [done | []]) :-
   member(package, Items).
 solveR(State0, N, [Move | Trace]) :-
   N > 0,
+  N1 is N - 1,
   move(State0, Move, State1),
-  solveR(State1, N - 1, Trace).
+  solveR(State1, N1, Trace).
 
 % helper functions for solving containing the initial state of building
 dosolve(R) :-
