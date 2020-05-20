@@ -3,8 +3,8 @@
 %    D7012E Declarative languages
 %    Luleå University of Technology
 %
-%    Student full name: <TO BE FILLED IN BEFORE THE GRADING> 
-%    Student user id  : <TO BE FILLED IN BEFORE THE GRADING> 
+%    Student full name: Hugo Wangler
+%    Student user id  : hugwan-6
 %
 /* ------------------------------------------------------- */
 
@@ -79,6 +79,8 @@ initBoard([ [.,.,.,.,.,.],
 %%% Using initBoard define initialize(InitialState,InitialPlyr). 
 %%%  holds iff InitialState is the initial state and 
 %%%  InitialPlyr is the player who moves first. 
+initialize(InitialState, 1) :-
+  initBoard(InitialState).
 
 
 
@@ -91,6 +93,21 @@ initBoard([ [.,.,.,.,.,.],
 %% define winner(State,Plyr) here.  
 %     - returns winning player if State is a terminal position and
 %     Plyr has a higher score than the other player 
+winner(State, 1) :-
+  terminal(State),
+  getscore(State, 1, P1Score),
+  getscore(State, 2, P2Score),
+  P1Score > P2Score.
+winner(State, 2) :-
+  terminal(State),
+  getscore(State, 1, P1Score),
+  getscore(State, 2, P2Score),
+  P2Score > P1Score.
+
+% returns the Score of Plyr in the current board State
+getscore(State, Plyr, Score) :-
+  findall(_, get(State, _, Plyr), PlyrStones),
+  length(PlyrStones, Score).
 
 
 
@@ -102,6 +119,10 @@ initBoard([ [.,.,.,.,.,.],
 %%
 %% define tie(State) here. 
 %    - true if terminal State is a "tie" (no winner) 
+tie(State) :-
+  terminal(State),
+  not(winner(State, 1)),
+  not(winner(State, 2)).
 
 
 
@@ -113,6 +134,13 @@ initBoard([ [.,.,.,.,.,.],
 %%
 %% define terminal(State). 
 %   - true if State is a terminal   
+terminal(State) :-
+  moves(1, State, P1MvList),
+  length(P1MvList, P1Moves),
+  P1Moves =:= 0,
+  moves(2, State, P2MvList),
+  length(P2MvList, P2Moves),
+  P2Moves =:= 0.
 
 
 
