@@ -97,12 +97,12 @@ winner(State, 1) :-
   terminal(State),
   getscore(State, 1, P1Score),
   getscore(State, 2, P2Score),
-  P1Score > P2Score.
+  P1Score < P2Score.
 winner(State, 2) :-
   terminal(State),
   getscore(State, 1, P1Score),
   getscore(State, 2, P2Score),
-  P2Score > P1Score.
+  P2Score < P1Score.
 
 % returns the Score of Plyr in the current board State
 getscore(State, Plyr, Score) :-
@@ -174,10 +174,196 @@ printList([H | L]) :-
 %% define moves(Plyr,State,MvList). 
 %   - returns list MvList of all legal moves Plyr can make in State
 %
+moves(Plyr, State, MvList) :-
+  setof(
+    [X, Y],
+    (get(State, [X, Y], Opponent), Opponent \= Plyr),
+    OpponentStones
+  ),
+  % if check_moves fails pass is only move (n)
+  (check_moves(Plyr, State, OpponentStones, MvList), ! ; MvList = [n]).
 
+% check_moves(Plyr, State, OpponentStones, MvList):
+%   Returnes a list of legal Moves the Plyr can make in the current state
+%   the moves are sorted left to right, top to bottom
+%
+% This is done by creating a set containing all legal moves to squares
+% adjacent to an opponent stone at [X, Y] on the board
+check_moves(Plyr, State, [[X, Y]], MvList) :-
+  setof(Move, check_move(Plyr, State, [X, Y], Move), MvList).
+check_moves(Plyr, State, [[X, Y] | Stones], MvList) :-
+  % all moves possible adjacent to opponent stone [X, Y]
+  setof(Move, check_move(Plyr, State, [X, Y], Move), MovesXY),
+  check_moves(Plyr, State, Stones, Moves),
+  append(MovesXY, Moves, MvList).
 
+% check_move(Plyr, State, OpponentStone, Move):
+%   Checks if placing a stone at positiong Move is legal
+%   the Move position is one of the 8 squares surrounding the opponents stone
+%   at pos [X, Y]
+%
+% Example: (all are variations checking different surrounding stones)
+%   Placing stone East of opponent stone at [X, Y]
+%   legal iff [X + 1, Y] is empty and west of [X, Y] contains at least one
+%   opponent stone followed by a player stone
+check_move(Plyr, State, [X, Y], [EastX, Y]) :- 
+  EastX is X + 1,
+  EastX < 6,
+  WestX is X - 1,
+  WestX >= 0,
+  is_empty(State, [EastX, Y]), % east of opponent stone is empty
+  check_west(Plyr, State, [WestX, Y]). % search for player stone west
+% Placing stone West of opponent stone
+check_move(Plyr, State, [X, Y], [WestX, Y]) :-
+  WestX is X - 1,
+  WestX >= 0,
+  EastX is X + 1,
+  EastX < 6,
+  is_empty(State, [WestX, Y]),
+  check_east(Plyr, State, [EastX, Y]).
+% Placing stone North of opponent stone
+check_move(Plyr, State, [X, Y], [X, NorthY]) :-
+  NorthY is Y - 1,
+  NorthY >= 0,
+  SouthY is Y + 1,
+  SouthY < 6,
+  is_empty(State, [X, NorthY]),
+  check_south(Plyr, State, [X, SouthY]).
+% Placing stone south of opponent stone
+check_move(Plyr, State, [X, Y], [X, SouthY]) :-
+  SouthY is Y + 1,
+  SouthY < 6,
+  NorthY is Y - 1,
+  NorthY >= 0,
+  is_empty(State, [X, SouthY]),
+  check_north(Plyr, State, [X, NorthY]).
+% Placing stone northeast of opponent stone
+check_move(Plyr, State, [X, Y], [NortheastX, NortheastY]) :-
+  ne(X, Y, NortheastX, NortheastY),
+  sw(X, Y, SouthwestX, SouthwestY),
+  is_empty(State, [NortheastX, NortheastY]),
+  check_sw(Plyr, State, [SouthwestX, SouthwestY]).
+% Placing stone southwest of opponent stone
+check_move(Plyr, State, [X, Y], [SouthwestX, SouthwestY]) :-
+  sw(X, Y, SouthwestX, SouthwestY),
+  ne(X, Y, NortheastX, NortheastY),
+  is_empty(State, [SouthwestX, SouthwestY]),
+  check_ne(Plyr, State, [NortheastX, NortheastY]).
+% Placing stone southeast of opponent stone
+check_move(Plyr, State, [X, Y], [SoutheastX, SoutheastY]) :-
+  se(X, Y, SoutheastX, SoutheastY),
+  nw(X, Y, NorthwestX, NorthwestY),
+  is_empty(State, [SoutheastX, SoutheastY]),
+  check_nw(Plyr, State, [NorthwestX, NorthwestY]).
+% Placing stone northwest of opponent stone
+check_move(Plyr, State, [X, Y], [NorthwestX, NorthwestY]) :-
+  nw(X, Y, NorthwestX, NorthwestY),
+  se(X, Y, SoutheastX, SoutheastY),
+  is_empty(State, [NorthwestX, NorthwestY]),
+  check_se(Plyr, State, [SoutheastX, SoutheastY]).
 
+% Case west contains opponent stone -> continue west
+check_west(Plyr, State, [X, Y]) :-
+  is_opponent(Plyr, State, [X, Y]),
+  WestX is X - 1,
+  WestX >= 0,
+  check_west(Plyr, State, [WestX, Y]).
+% Case found player stone west of opponent stone(s) -> move is legal
+check_west(Plyr, State, Pos) :-
+  is_player(Plyr, State, Pos).
 
+check_east(Plyr, State, [X, Y]) :-
+  is_opponent(Plyr, State, [X, Y]),
+  EastX is X + 1,
+  EastX < 6,
+  check_east(Plyr, State, [EastX, Y]).
+check_east(Plyr, State, [X, Y]) :-
+  is_player(Plyr, State, [X, Y]).
+
+check_south(Plyr, State, [X, Y]) :-
+  is_opponent(Plyr, State, [X, Y]),
+  SouthY is Y + 1,
+  SouthY < 6,
+  check_south(Plyr, State, [X, SouthY]).
+check_south(Plyr, State, [X, Y]) :-
+  is_player(Plyr, State, [X, Y]).
+
+check_north(Plyr, State, [X, Y]) :-
+  is_opponent(Plyr, State, [X, Y]),
+  NorthY is Y - 1,
+  NorthY >= 0,
+  check_north(Plyr, State, [X, NorthY]).
+check_north(Plyr, State, [X, Y]) :-
+  is_player(Plyr, State, [X, Y]).
+
+check_se(Plyr, State, [X, Y]) :-
+  is_opponent(Plyr, State, [X, Y]),
+  se(X, Y, SoutheastX, SoutheastY),
+  check_se(Plyr, State, [SoutheastX, SoutheastY]).
+check_se(Plyr, State, [X, Y]) :-
+  is_player(Plyr, State, [X, Y]).
+
+check_ne(Plyr, State, [X, Y]) :-
+  is_opponent(Plyr, State, [X, Y]),
+  ne(X, Y, NortheastX, NortheastY),
+  check_ne(Plyr, State, [NortheastX, NortheastY]).
+check_ne(Plyr, State, [X, Y]) :-
+  is_player(Plyr, State, [X, Y]).
+
+check_nw(Plyr, State, [X, Y]) :-
+  is_opponent(Plyr, State, [X, Y]),
+  nw(X, Y, NorthwestX, NorthwestY),
+  check_nw(Plyr, State, [NorthwestX, NorthwestY]).
+check_nw(Plyr, State, [X, Y]) :-
+  is_player(Plyr, State, [X, Y]).
+
+check_sw(Plyr, State, [X, Y]) :-
+  is_opponent(Plyr, State, [X, Y]),
+  sw(X, Y, SouthwestX, SouthwestY),
+  check_sw(Plyr, State, [SouthwestX, SouthwestY]).
+check_sw(Plyr, State, [X, Y]) :-
+  is_player(Plyr, State, [X, Y]).
+
+% Checks if a position [X, Y] is empty on the board
+is_empty(State, [X, Y]) :-
+  get(State, [X, Y], Value),
+  Value == '.'.
+
+% Checks if a position [X, Y] contains a Plyr stone
+is_player(Plyr, State, [X, Y]) :-
+  get(State, [X, Y], Plyr).
+
+% Checks if position [X, Y] contains an opponent stone
+is_opponent(Plyr, State, [X, Y]) :-
+  get(State, [X, Y], Stone),
+  (Plyr = 1 -> Stone == 2
+  ;Stone == 1
+  ).
+
+% Returns the the point southeast of [X, Y] iff it is inside the 6x6 board
+se(X, Y, SoutheastX, SoutheastY) :-
+  SoutheastX is X + 1,
+  SoutheastX < 6,
+  SoutheastY is Y + 1,
+  SoutheastY < 6.
+
+ne(X, Y, NortheastX, NortheastY) :-
+  NortheastX is X + 1,
+  NortheastX < 6,
+  NortheastY is Y - 1,
+  NortheastY >= 0.
+
+sw(X, Y, SouthwestX, SouthwestY) :-
+  SouthwestX is X - 1,
+  SouthwestX >= 0,
+  SouthwestY is Y + 1,
+  SouthwestY < 6.
+
+nw(X, Y, NorthwestX, NorthwestY) :-
+  NorthwestX is X - 1,
+  NorthwestX > 0,
+  NorthwestY is Y - 1,
+  NorthwestY > 0.
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
