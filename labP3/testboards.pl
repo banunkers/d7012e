@@ -35,7 +35,7 @@ testBoard3([ [.,.,.,2,.,.],
 
 % both players can move but when player 1 moves, that move flips from right to left
 % along the top row
-flipRLtop([[.,1,2,2,2,.],
+flipRLtop([[.,1,2,2,2,.], % ok
 	   [.,.,.,.,.,.],
 	   [.,.,.,.,.,.],
 	   [.,.,.,.,.,.],
@@ -44,7 +44,7 @@ flipRLtop([[.,1,2,2,2,.],
 
 % only player 2 can move, and that move flips from left to right
 % along the bottom row
-flipLRbottom([[.,.,.,.,.,.],
+flipLRbottom([[.,.,.,.,.,.], % ok
 	      [.,.,.,.,.,.],
 	      [.,.,.,.,.,.],
 	      [.,.,.,.,.,.],
@@ -53,7 +53,7 @@ flipLRbottom([[.,.,.,.,.,.],
 
 % only player 2 can move, and that move flips from top to bottom
 % along the left column
-flipTBleft([[.,.,.,.,.,.],
+flipTBleft([[.,.,.,.,.,.], % ok
             [1,.,.,.,.,.],
             [1,.,.,.,.,.],
             [1,.,.,.,.,.],
@@ -62,7 +62,7 @@ flipTBleft([[.,.,.,.,.,.],
 
 % only player 1 can move, and that move flips from bottom to top
 % along the right column
-flipBTright([[.,.,.,.,.,1],
+flipBTright([[.,.,.,.,.,1], % ok
 	     [.,.,.,.,.,2],
 	     [.,.,.,.,.,2],
 	     [.,.,.,.,.,2],
@@ -71,16 +71,16 @@ flipBTright([[.,.,.,.,.,1],
 
 % only player 1 can move, and that move flips along the main
 % diagional from upper left to lower right
-flipDiagULtoLR([[.,.,.,.,.,.],
+flipDiagULtoLR([[.,.,.,.,.,.], % ok
 		[.,2,.,.,.,.],
 		[.,.,2,.,.,.],
 		[.,.,.,2,.,.],
-		[.,.,.,.,1,.],
-		[.,.,.,.,.,.]]).
+		[.,.,.,.,2,.],
+		[.,.,.,.,.,1]]).
 
 % only player 2 can move, and that move flips along the main
 % diagional from upper right to lower left
-flipDiagURtoLL([[.,.,.,.,.,.],
+flipDiagURtoLL([[.,.,.,.,.,.], % ok
 		[.,.,.,.,1,.],
 		[.,.,.,1,.,.],
 		[.,.,1,.,.,.],
@@ -88,7 +88,7 @@ flipDiagURtoLL([[.,.,.,.,.,.],
 		[2,.,.,.,.,.]]).
 
 % no moves possible, and no flips
-noMovesNoFlipsA([[1,2,1,2,1,2],
+noMovesNoFlipsA([[1,2,1,2,1,2], % ok
 		 [2,1,1,1,2,2],
 		 [1,1,.,1,1,1],
 		 [2,1,1,1,2,2],
@@ -96,7 +96,7 @@ noMovesNoFlipsA([[1,2,1,2,1,2],
 		 [2,2,1,2,2,1]]).
 
 % no moves possible, and no flips
-noMovesNoFlipsB([[2,1,2,1,2,1],
+noMovesNoFlipsB([[2,1,2,1,2,1], % ok
 		 [1,2,2,2,1,1],
 		 [2,2,.,2,2,2],
 		 [1,2,2,2,1,1],
@@ -104,7 +104,7 @@ noMovesNoFlipsB([[2,1,2,1,2,1],
 		 [1,1,2,1,1,2]]).
 
 % player 1 can move, and that move flips left and right only
-flipLRonly1([[.,.,.,2,.,.],
+flipLRonly1([[.,.,.,2,.,.], % ok
 	     [.,.,.,1,.,.],
 	     [.,.,.,1,.,.],
 	     [1,2,2,.,2,1],
@@ -112,7 +112,7 @@ flipLRonly1([[.,.,.,2,.,.],
 	     [.,.,.,2,.,.]]).
 
 % only player 1 can move, and that move flips in all 8 directions
-flipAll8Dirs1([[1,2,1,2,1,2],
+flipAll8Dirs1([[1,2,1,2,1,2], % ok
 	       [2,2,2,2,2,2],
 	       [1,2,.,2,2,1],
 	       [2,2,2,2,2,2],
@@ -120,7 +120,7 @@ flipAll8Dirs1([[1,2,1,2,1,2],
 	       [2,2,1,2,2,1]]).
 
 % only player 2 can move, and that move flips in all 8 directions
-flipAll8Dirs2([[2,2,2,2,2,2],
+flipAll8Dirs2([[2,2,2,2,2,2], % ok
 	       [2,1,2,1,2,2],
 	       [2,2,1,1,1,2],
 	       [2,1,1,.,1,2],
