@@ -122,8 +122,9 @@ getscore(State, Plyr, Score) :-
 %    - true if terminal State is a "tie" (no winner) 
 tie(State) :-
   terminal(State),
-  not(winner(State, 1)),
-  not(winner(State, 2)).
+  getscore(State, 1, P1Score),
+  getscore(State, 2, P2Score),
+  P1Score == P2Score.
 
 
 
@@ -137,11 +138,9 @@ tie(State) :-
 %   - true if State is a terminal   
 terminal(State) :-
   moves(1, State, P1MvList),
-  length(P1MvList, P1Moves),
-  P1Moves =:= 0,
+  P1MvList == [n],
   moves(2, State, P2MvList),
-  length(P2MvList, P2Moves),
-  P2Moves =:= 0.
+  P2MvList == [n].
 
 
 
