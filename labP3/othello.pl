@@ -11,8 +11,10 @@
 
 
 %do not chagne the follwoing line!
-:- ensure_loaded('play.pl').
+%:- ensure_loaded('play.pl').
 :- ensure_loaded('testboards.pl').
+:- ensure_loaded('stupid.pl').
+:- ensure_loaded('rndBoard.pl').
 
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
@@ -192,6 +194,7 @@ moves(Plyr, State, SortedMvList) :-
 %
 % This is done by finding all legal moves to squares
 % adjacent to an opponent stone at [X, Y] on the board
+check_moves(_, _, [], []).
 check_moves(Plyr, State, [[X, Y]], MvList) :-
   findall(Move, check_move(Plyr, State, [X, Y], Move), MvList).
 check_moves(Plyr, State, [Stone | Stones], MvList) :-
@@ -378,25 +381,18 @@ nw(X, Y, NorthwestX, NorthwestY) :-
 %     state) and NextPlayer (i.e. the next player who will move).
 %
 
-nextState(1, [n], State, State, 2).
-nextState(2, [n], State, State, 1).
+nextState(1, n, State, State, 2).
+nextState(2, n, State, State, 1).
 nextState(1, Move, State, NewState, 2) :-
   do_move(1, Move, State, NewState).
 nextState(2, Move, State, NewState, 1) :-
   do_move(2, Move, State, NewState).
 
 do_move(Plyr, [X, Y], State, NewState) :-
-  showState(State),
-  writeln([X, Y]),
   set(State, TempState, [X, Y], Plyr),
   % find the directions which will be affected by the move
   findall(Dir, get_flip_dir(Plyr, TempState, [X, Y], Dir), FlipDirs),
-  writeln(FlipDirs),
-  writeln("placing stone"),
-  showState(TempState),
-  writeln("flipping stones"),
-  flip(Plyr, FlipDirs, [X, Y], TempState, NewState),
-  showState(NewState).
+  flip(Plyr, FlipDirs, [X, Y], TempState, NewState).
 
 % Returnes a direction from the newly placed stone [X, Y] in which stones
 % will be flipped as a result of the move.
@@ -563,7 +559,13 @@ validmove(Plyr, State, Proposed) :-
 %   NOTE2. If State is not terminal h should be an estimate of
 %          the value of state (see handout on ideas about
 %          good heuristics.
-
+h(State, 50) :-
+  winner(State, 2).
+h(State, -50) :-
+  winner(State, 1).
+h(State, 0) :-
+  tie(State).
+h(_, 0).
 
 
 
@@ -575,7 +577,7 @@ validmove(Plyr, State, Proposed) :-
 %% define lowerBound(B).  
 %   - returns a value B that is less than the actual or heuristic value
 %     of all states.
-
+lowerBound(-51).
 
 
 
@@ -587,6 +589,7 @@ validmove(Plyr, State, Proposed) :-
 %% define upperBound(B). 
 %   - returns a value B that is greater than the actual or heuristic value
 %     of all states.
+upperBound(51).
 
 
 

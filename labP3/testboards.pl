@@ -133,7 +133,7 @@ flipAll8Dirs2([[2,2,2,2,2,2], % ok
 %%
 
 % both players can make a move; if 1 moves first, 2 moves, and then a tie with a full board
-tieInTwoMovesFullBoard([[.,2,2,1,2,2], 
+tieInTwoMovesFullBoard([[.,2,2,1,2,2], % ok
 			[2,2,2,2,2,1], 
 			[2,2,2,2,2,1],
 			[2,2,2,1,1,1], 
@@ -142,7 +142,7 @@ tieInTwoMovesFullBoard([[.,2,2,1,2,2],
 
 
 % an immediate tie with 4 unplayable squares
-tieFourEmptyInCorners([[.,2,2,2,2,.],
+tieFourEmptyInCorners([[.,2,2,2,2,.], % ok
 		       [1,2,2,2,1,1],
 		       [1,2,2,1,1,1],
 		       [1,2,1,2,1,1],
@@ -151,7 +151,7 @@ tieFourEmptyInCorners([[.,2,2,2,2,.],
 
 
 % an immediate tie with 2 unplayable squares
-tieFourEmptyOnBorders([[2,2,.,.,1,1],
+tieFourEmptyOnBorders([[2,2,.,.,1,1], % ok
 		       [1,1,1,2,2,2],
 		       [1,1,1,2,2,2],
 		       [1,1,1,2,2,2],
@@ -160,7 +160,7 @@ tieFourEmptyOnBorders([[2,2,.,.,1,1],
 
 
 % player 1 can make 1 move, then tie with four empty
-tieFourEmptyOnly1canMove([[.,2,2,2,2,.],
+tieFourEmptyOnly1canMove([[.,2,2,2,2,.], % ok
 			  [1,2,2,2,1,1],
 			  [1,2,2,1,1,1],
 			  [2,2,1,2,1,1],
@@ -168,7 +168,7 @@ tieFourEmptyOnly1canMove([[.,2,2,2,2,.],
 			  [.,2,2,2,2,.]]).
 
 % only player 1 can make a move, and then it's a 3-3 tie
-tie30emptyOnly1canMove([[.,.,.,.,.,.],
+tie30emptyOnly1canMove([[.,.,.,.,.,.], % ok
 			[.,.,.,.,.,.],
 			[2,.,2,1,2,2],
 			[.,.,.,.,.,.],
@@ -176,7 +176,7 @@ tie30emptyOnly1canMove([[.,.,.,.,.,.],
 			[.,.,.,.,.,.]]).
 
 % only player 2 can make a move, and then it's a 3-3 tie
-tie30emptyOnly2canMove([[.,.,.,.,.,.],
+tie30emptyOnly2canMove([[.,.,.,.,.,.], % ok
 			[.,.,.,.,.,.],
 			[1,.,1,2,1,1],
 			[.,.,.,.,.,.],
@@ -189,7 +189,7 @@ tie30emptyOnly2canMove([[.,.,.,.,.,.],
 %%
 
 % both players can make one move each, and then player 1 wins
-winInTwoMovesFullBoard([[.,2,1,1,1,2], 
+winInTwoMovesFullBoard([[.,2,1,1,1,2], % ok
 			[2,2,2,2,2,1], 
 			[1,2,2,2,2,1],
 			[1,2,2,1,2,1], 
@@ -197,7 +197,7 @@ winInTwoMovesFullBoard([[.,2,1,1,1,2],
 			[2,1,1,1,1,.]]).
 
 % player 1 is an immediate winner, 0-36
-onlyTwos([[2,2,2,2,2,2], 
+onlyTwos([[2,2,2,2,2,2], % ok
 	  [2,2,2,2,2,2],
 	  [2,2,2,2,2,2], 
 	  [2,2,2,2,2,2], 
@@ -206,7 +206,7 @@ onlyTwos([[2,2,2,2,2,2],
 
 
 % player 2 is an immediate winner, 0-36
-onlyOnes([[1,1,1,1,1,1], 
+onlyOnes([[1,1,1,1,1,1],  % ok
 	  [1,1,1,1,1,1],
 	  [1,1,1,1,1,1], 
 	  [1,1,1,1,1,1], 
@@ -219,7 +219,7 @@ onlyOnes([[1,1,1,1,1,1],
 %%
 
 % player 2 has no move, but 1 has two; then 1 wins
-forcing2toDoNullMove([[.,.,.,.,.,.],
+forcing2toDoNullMove([[.,.,.,.,.,.], % ok
 		      [.,.,.,.,.,2],
 		      [.,.,.,.,.,2],
 		      [.,.,.,.,.,2],
@@ -227,7 +227,7 @@ forcing2toDoNullMove([[.,.,.,.,.,.],
 		      [.,2,2,2,2,1]]).
 
 % player 1 has no moves, but 2 has two; then 2 wins
-forcing1toDoNullMoves([[.,.,.,.,.,.],
+forcing1toDoNullMoves([[.,.,.,.,.,.], % ok
 		       [.,.,.,.,.,1],
 		       [.,.,.,.,.,1],
 		       [.,.,.,.,.,1],
