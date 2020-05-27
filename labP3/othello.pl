@@ -83,11 +83,42 @@ initBoard([ [.,.,.,.,.,.],
 %%%  holds iff InitialState is the initial state and 
 %%%  InitialPlyr is the player who moves first. 
 initialize(InitialState, 1) :-
+  %initBoard(InitialState).
+
+  % 2. 3 test boards
+  %flipAll8Dirs2(InitialState). % flip all -> full board of 2s
+  %tie30emptyOnly2canMove(InitialState). % 2 moves then tie
+  %forcing2toDoNullMove(InitialState). % 2 null move
+
+  % 3. 3 test runs with random boards
+  %rndBoardXYZ(InitialState).
+
+  % 4. 2 runs against stupid
   initBoard(InitialState).
 
-
-
-
+  %% Test boards
+  %testBoard1(InitialState).
+  %testBoard2(InitialState).
+  %testBoard3(InitialState).
+  %flipRLtop(InitialState).
+  %flipLRbottom(InitialState).
+  %flipTBleft(InitialState).
+  %flipBTright(InitialState).
+  %flipDiagULtoLR(InitialState).
+  %flipDiagURtoLL(InitialState).
+  %noMovesNoFlipsA(InitialState).
+  %noMovesNoFlipsB(InitialState).
+  %flipLRonly1(InitialState).
+  %flipAll8Dirs1(InitialState).
+  %tieInTwoMovesFullBoard(InitialState).
+  %tieFourEmptyInCorners(InitialState).
+  %tieFourEmptyOnBorders(InitialState).
+  %tieFourEmptyOnly1canMove(InitialState).
+  %tie30emptyOnly1canMove(InitialState).
+  %winInTwoMovesFullBoard(InitialState).
+  %onlyTwos(InitialState).
+  %onlyOnes(InitialState).
+  %forcing1toDoNullMoves(InitialState).
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
@@ -184,7 +215,7 @@ moves(Plyr, State, SortedMvList) :-
   ),
   check_moves(Plyr, State, OpponentStones, Moves),
   length(Moves, NumMoves),
-  (NumMoves == 0 -> MvList = [n] ; MvList = Moves),
+  (NumMoves == 0 -> MvList = [n], ! ; MvList = Moves, !),
   % sort left to right top to buttom using predefined predicate
   sort(MvList, SortedMvList). 
 
@@ -195,8 +226,8 @@ moves(Plyr, State, SortedMvList) :-
 % This is done by finding all legal moves to squares
 % adjacent to an opponent stone at [X, Y] on the board
 check_moves(_, _, [], []).
-check_moves(Plyr, State, [[X, Y]], MvList) :-
-  findall(Move, check_move(Plyr, State, [X, Y], Move), MvList).
+%check_moves(Plyr, State, [[X, Y]], MvList) :-
+%  findall(Move, check_move(Plyr, State, [X, Y], Move), MvList).
 check_moves(Plyr, State, [Stone | Stones], MvList) :-
   % all moves possible adjacent to opponent stone [X, Y]
   findall(Move, check_move(Plyr, State, Stone, Move), MovesXY),
@@ -268,6 +299,8 @@ check_move(Plyr, State, [X, Y], [NorthwestX, NorthwestY]) :-
   is_empty(State, [NorthwestX, NorthwestY]),
   check_se(Plyr, State, [SoutheastX, SoutheastY]).
 
+% The following check_DIRECTION predicates checks that a direction on
+% the board contains a legal pattern of stones.
 % Case west contains opponent stone -> continue west
 check_west(Plyr, State, [X, Y]) :-
   is_opponent(Plyr, State, [X, Y]),
@@ -559,13 +592,17 @@ validmove(Plyr, State, Proposed) :-
 %   NOTE2. If State is not terminal h should be an estimate of
 %          the value of state (see handout on ideas about
 %          good heuristics.
-h(State, 50) :-
+h(State, -100) :-
   winner(State, 2).
-h(State, -50) :-
+h(State, 100) :-
   winner(State, 1).
 h(State, 0) :-
   tie(State).
-h(_, 0).
+h(State, Val) :-
+  getscore(State, 2, P2Score),
+  getscore(State, 1, P1Score),
+  Val is P2Score - P1Score.
+
 
 
 
@@ -577,7 +614,7 @@ h(_, 0).
 %% define lowerBound(B).  
 %   - returns a value B that is less than the actual or heuristic value
 %     of all states.
-lowerBound(-51).
+lowerBound(-101).
 
 
 
@@ -589,7 +626,7 @@ lowerBound(-51).
 %% define upperBound(B). 
 %   - returns a value B that is greater than the actual or heuristic value
 %     of all states.
-upperBound(51).
+upperBound(101).
 
 
 
